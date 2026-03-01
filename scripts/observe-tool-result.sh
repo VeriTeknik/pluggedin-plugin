@@ -46,3 +46,32 @@ curl -s -X POST "${BASE_URL}/api/memory/sessions/${SESSION_UUID}/observations" \
   -H "Content-Type: application/json" \
   -d "{\"observationType\": \"${OBSERVATION_TYPE}\", \"content\": ${CONTENT_ESCAPED}}" \
   2>/dev/null > /dev/null || true
+
+# If error detected, query CBP for collective knowledge about this error
+if [ "$OBSERVATION_TYPE" = "error_pattern" ]; then
+  ERROR_QUERY=$(echo "$CONTENT" | head -c 300)
+  ERROR_QUERY_ENCODED=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.stdin.read().strip()))" <<< "$ERROR_QUERY" 2>/dev/null || echo "")
+
+  if [ -n "$ERROR_QUERY_ENCODED" ]; then
+    CBP_RESULT=$(curl -s -X GET "${BASE_URL}/api/memory/cbp?query=${ERROR_QUERY_ENCODED}&context=post_error" \
+      -H "Authorization: Bearer ${API_KEY}" \
+      2>/dev/null || echo "")
+
+    # If CBP returned patterns, output them for Claude Code context injection
+    if echo "$CBP_RESULT" | python3 -c "import json,sys; d=json.load(sys.stdin); exit(0 if d.get('success') and d.get('data') else 1)" 2>/dev/null; then
+      PATTERNS=$(echo "$CBP_RESULT" | python3 -c "
+import json,sys
+d=json.load(sys.stdin)
+for p in (d.get('data') or [])[:3]:
+    print(f\"[CBP] {p.get('patternType','')}: {p.get('pattern', p.get('description',''))}\")
+" 2>/dev/null || echo "")
+
+      if [ -n "$PATTERNS" ]; then
+        echo "<pluggedin-cbp-suggestion>"
+        echo "Collective knowledge suggests:"
+        echo "$PATTERNS"
+        echo "</pluggedin-cbp-suggestion>"
+      fi
+    fi
+  fi
+fi
