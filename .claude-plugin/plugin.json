@@ -1,0 +1,17 @@
+{
+  "name": "pluggedin",
+  "version": "1.0.0",
+  "description": "Plugged.in AI Infrastructure Platform integration - memory system, knowledge base, clipboard, and tool management for Claude Code",
+  "author": {
+    "name": "Cem Karaca",
+    "url": "https://github.com/VeriTeknik"
+  },
+  "homepage": "https://plugged.in",
+  "repository": "https://github.com/VeriTeknik/pluggedin-plugin",
+  "license": "MIT",
+  "keywords": ["pluggedin", "memory", "rag", "mcp", "agents", "knowledge-base"],
+  "skills": "./skills/",
+  "agents": "./agents/",
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": "./.mcp.json"
+}
