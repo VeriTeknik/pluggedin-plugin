@@ -45,8 +45,7 @@
           {
             "type": "command",
             "command": "${CLAUDE_PLUGIN_ROOT}/scripts/pre-tool-use.sh",
-            "timeout": 5,
-            "async": false
+            "timeout": 3
           }
         ]
       }

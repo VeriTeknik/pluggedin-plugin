@@ -41,9 +41,34 @@ if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
       -H "Authorization: Bearer ${API_KEY}" \
       --max-time 3 2>/dev/null || true)
 
-    INDIV_TOTAL=$(echo "$INDIVIDUATION" | python3 -c "import sys,json; d=json.load(sys.stdin).get('data',{}); print(d.get('total',0))" 2>/dev/null || echo "0")
-    INDIV_LEVEL=$(echo "$INDIVIDUATION" | python3 -c "import sys,json; d=json.load(sys.stdin).get('data',{}); print(d.get('level','nascent'))" 2>/dev/null || echo "nascent")
-    INDIV_TIP=$(echo "$INDIVIDUATION" | python3 -c "import sys,json; d=json.load(sys.stdin).get('data',{}); print(d.get('tip',''))" 2>/dev/null || echo "")
+    # Parse all individuation fields in a single python3 call (tab-delimited)
+    INDIV_VALUES=$(echo "$INDIVIDUATION" | python3 -c "
+import sys, json
+try:
+    data = json.load(sys.stdin).get('data', {})
+except Exception:
+    data = {}
+total = str(data.get('total', 0))
+level = str(data.get('level', 'nascent'))
+tip = str(data.get('tip', ''))
+# Sanitize: strip angle brackets and tabs to prevent tag/delimiter injection
+for ch in ('<', '>', '\t', '\r', '\n'):
+    level = level.replace(ch, '')
+    tip = tip.replace(ch, ' ')
+    total = total.replace(ch, '')
+print(f'{total}\t{level}\t{tip}')
+" 2>/dev/null || true)
+
+    if [ -z "$INDIV_VALUES" ]; then
+      INDIV_TOTAL="0"
+      INDIV_LEVEL="nascent"
+      INDIV_TIP=""
+    else
+      IFS=$'\t' read -r INDIV_TOTAL INDIV_LEVEL INDIV_TIP <<< "$INDIV_VALUES"
+      : "${INDIV_TOTAL:=0}"
+      : "${INDIV_LEVEL:=nascent}"
+      : "${INDIV_TIP:=}"
+    fi
 
     echo "<pluggedin-memory-session>"
     echo "Memory session started (${MEMORY_SESSION_ID})."
