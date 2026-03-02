@@ -9,9 +9,5 @@
   "homepage": "https://plugged.in",
   "repository": "https://github.com/VeriTeknik/pluggedin-plugin",
   "license": "MIT",
-  "keywords": ["pluggedin", "memory", "rag", "mcp", "agents", "knowledge-base"],
-  "skills": "./skills/",
-  "agents": "./agents/",
-  "hooks": "./hooks/hooks.json",
-  "mcpServers": "./.mcp.json"
+  "keywords": ["pluggedin", "memory", "rag", "mcp", "agents", "knowledge-base"]
 }
