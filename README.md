@@ -68,9 +68,9 @@ export PLUGGEDIN_API_KEY="pg_in_your_key_here"
 
 ## Features
 
-### MCP Tools (22 tools via the Plugged.in platform)
+### MCP Tools (24 tools via the Plugged.in platform)
 
-#### Memory (5 tools)
+#### Memory (7 tools)
 
 | Tool | Purpose |
 |------|---------|
@@ -79,6 +79,8 @@ export PLUGGEDIN_API_KEY="pg_in_your_key_here"
 | `pluggedin_memory_observe` | Record an observation (error, preference, decision, etc.) |
 | `pluggedin_memory_search` | Semantic search across memories (returns summaries) |
 | `pluggedin_memory_details` | Get full content for specific memories by UUID |
+| `pluggedin_memory_search_with_context` | Archetype-enhanced search — returns personal memories + collective patterns filtered through Shadow/Sage/Hero/Trickster based on context |
+| `pluggedin_memory_individuation` | Get individuation score (0-100) with Memory Depth, Learning Velocity, Collective Contribution, Self-Awareness components and tips |
 
 #### Knowledge Base (1 tool)
 
@@ -143,16 +145,28 @@ export PLUGGEDIN_API_KEY="pg_in_your_key_here"
 | **Memory Curator** | Classifies fresh observations into memory ring types: Procedures (repeatable workflows), Practice (successful habits), Long-term (validated insights), and Shocks (critical failures that bypass decay) |
 | **Focus Assistant** | Manages a working set of 7+/-2 most relevant items for the current task context, inspired by human working memory limits. Updates the set as task context shifts. |
 
-### Lifecycle Hooks (4 automatic hooks)
+### Lifecycle Hooks (5 automatic hooks)
 
-The plugin manages memory sessions automatically through Claude Code lifecycle hooks:
+The plugin manages memory sessions and Jungian intelligence automatically through Claude Code lifecycle hooks:
 
 | Hook | Trigger | What It Does |
 |------|---------|--------------|
-| **SessionStart** | Claude Code session begins | Starts a new memory session via the Plugged.in API and stores the session UUID for other hooks |
+| **SessionStart** | Claude Code session begins | Starts a new memory session, displays your individuation score and maturity level |
+| **PreToolUse** | Before any tool execution | Queries archetype-routed collective patterns and injects relevant suggestions (Shadow for errors, Sage for knowledge, Hero for workflows, Trickster after consecutive failures) |
 | **PreCompact** | Before context compaction (auto or manual) | Searches for memories relevant to the current project and injects them into context so they survive compaction |
-| **PostToolUse (Bash)** | After any Bash command execution | Asynchronously captures tool results as observations; detects error patterns and queries Collective Best Practices (CBP) for known solutions |
+| **PostToolUse (Bash)** | After any Bash command execution | Records temporal events for synchronicity detection; captures tool results as observations; queries CBP for known error solutions |
 | **Stop** | Claude Code session ends | Ends the memory session, triggers Z-report generation, and cleans up temporary state |
+
+## Jungian Intelligence Layer (v3.2.0)
+
+The plugin integrates four cognitive capabilities inspired by Jungian psychology:
+
+- **Synchronicity Detection**: Discovers temporal patterns across profiles — tool co-occurrences, failure correlations, and emergent workflows
+- **Dream Processing**: Batch consolidation that clusters and merges semantically similar memories during off-peak hours
+- **Archetype-Driven Behavior**: Context-aware pattern delivery through Shadow (error recovery), Sage (best practices), Hero (workflow guidance), and Trickster (creative alternatives after repeated failures)
+- **Individuation Metrics**: Per-profile maturity scoring (0-100) across Memory Depth, Learning Velocity, Collective Contribution, and Self-Awareness
+
+These features work automatically through the lifecycle hooks — no manual configuration needed.
 
 ## Architecture
 
