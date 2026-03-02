@@ -13,7 +13,7 @@
     {
       "name": "pluggedin",
       "version": "1.0.0",
-      "source": ".",
+      "source": "./plugin",
       "description": "Plugged.in AI Infrastructure Platform integration - memory system, knowledge base, clipboard, and tool management for Claude Code"
     }
   ]
