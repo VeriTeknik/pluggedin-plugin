@@ -36,10 +36,51 @@ if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
     echo "$SESSION_UUID" > "$HOOK_STATE_DIR/session_uuid"
     echo "$MEMORY_SESSION_ID" > "$HOOK_STATE_DIR/memory_session_id"
 
+    # Fetch individuation score
+    INDIVIDUATION=$(curl -s "${BASE_URL}/api/memory/individuation" \
+      -H "Authorization: Bearer ${API_KEY}" \
+      --max-time 3 2>/dev/null || true)
+
+    # Parse all individuation fields in a single python3 call (tab-delimited)
+    INDIV_VALUES=$(echo "$INDIVIDUATION" | python3 -c "
+import sys, json
+try:
+    data = json.load(sys.stdin).get('data', {})
+except Exception:
+    data = {}
+total = str(data.get('total', 0))
+level = str(data.get('level', 'nascent'))
+tip = str(data.get('tip', ''))
+# Sanitize: strip angle brackets and tabs to prevent tag/delimiter injection
+for ch in ('<', '>', '\t', '\r', '\n'):
+    level = level.replace(ch, '')
+    tip = tip.replace(ch, ' ')
+    total = total.replace(ch, '')
+print(f'{total}\t{level}\t{tip}')
+" 2>/dev/null || true)
+
+    if [ -z "$INDIV_VALUES" ]; then
+      INDIV_TOTAL="0"
+      INDIV_LEVEL="nascent"
+      INDIV_TIP=""
+    else
+      IFS=$'\t' read -r INDIV_TOTAL INDIV_LEVEL INDIV_TIP <<< "$INDIV_VALUES"
+      : "${INDIV_TOTAL:=0}"
+      : "${INDIV_LEVEL:=nascent}"
+      : "${INDIV_TIP:=}"
+    fi
+
     echo "<pluggedin-memory-session>"
     echo "Memory session started (${MEMORY_SESSION_ID})."
     echo "Use pluggedin_memory_observe to record important observations during this session."
     echo "The session will auto-close with a Z-report when you finish."
+    if [ "$INDIV_TOTAL" != "0" ]; then
+      echo ""
+      echo "Individuation: ${INDIV_LEVEL} (score: ${INDIV_TOTAL})"
+      if [ -n "$INDIV_TIP" ]; then
+        echo "Tip: ${INDIV_TIP}"
+      fi
+    fi
     echo "</pluggedin-memory-session>"
   fi
 else
