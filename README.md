@@ -17,15 +17,19 @@ This plugin connects Claude Code to the Plugged.in platform, giving you access t
 
 ### Installation
 
-```bash
-claude plugin add VeriTeknik/pluggedin-plugin
-```
-
-Or manually clone the repository into your Claude Code plugins directory:
+Inside Claude Code, open the plugin manager and add the marketplace:
 
 ```bash
-git clone https://github.com/VeriTeknik/pluggedin-plugin.git
+/plugin marketplace add VeriTeknik/pluggedin-plugin
 ```
+
+Then install the plugin:
+
+```bash
+/plugin install pluggedin@VeriTeknik-pluggedin-plugin
+```
+
+Or use the interactive plugin manager (`/plugin`) to browse and install from the **Discover** tab.
 
 The plugin uses the Anthropic MCP proxy to connect to the Plugged.in MCP endpoint. The `.mcp.json` configuration:
 

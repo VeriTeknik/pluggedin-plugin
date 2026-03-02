@@ -1,0 +1,20 @@
+{
+  "name": "VeriTeknik",
+  "description": "Plugged.in AI Infrastructure Platform plugins",
+  "owner": {
+    "name": "Cem Karaca",
+    "url": "https://github.com/VeriTeknik"
+  },
+  "metadata": {
+    "description": "Plugins by VeriTeknik for the Plugged.in platform",
+    "homepage": "https://plugged.in"
+  },
+  "plugins": [
+    {
+      "name": "pluggedin",
+      "version": "1.0.0",
+      "source": ".",
+      "description": "Plugged.in AI Infrastructure Platform integration - memory system, knowledge base, clipboard, and tool management for Claude Code"
+    }
+  ]
+}
