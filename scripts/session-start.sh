@@ -36,10 +36,26 @@ if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
     echo "$SESSION_UUID" > "$HOOK_STATE_DIR/session_uuid"
     echo "$MEMORY_SESSION_ID" > "$HOOK_STATE_DIR/memory_session_id"
 
+    # Fetch individuation score
+    INDIVIDUATION=$(curl -s "${BASE_URL}/api/memory/individuation" \
+      -H "Authorization: Bearer ${API_KEY}" \
+      --max-time 3 2>/dev/null || true)
+
+    INDIV_TOTAL=$(echo "$INDIVIDUATION" | python3 -c "import sys,json; d=json.load(sys.stdin).get('data',{}); print(d.get('total',0))" 2>/dev/null || echo "0")
+    INDIV_LEVEL=$(echo "$INDIVIDUATION" | python3 -c "import sys,json; d=json.load(sys.stdin).get('data',{}); print(d.get('level','nascent'))" 2>/dev/null || echo "nascent")
+    INDIV_TIP=$(echo "$INDIVIDUATION" | python3 -c "import sys,json; d=json.load(sys.stdin).get('data',{}); print(d.get('tip',''))" 2>/dev/null || echo "")
+
     echo "<pluggedin-memory-session>"
     echo "Memory session started (${MEMORY_SESSION_ID})."
     echo "Use pluggedin_memory_observe to record important observations during this session."
     echo "The session will auto-close with a Z-report when you finish."
+    if [ "$INDIV_TOTAL" != "0" ]; then
+      echo ""
+      echo "Individuation: ${INDIV_LEVEL} (score: ${INDIV_TOTAL})"
+      if [ -n "$INDIV_TIP" ]; then
+        echo "Tip: ${INDIV_TIP}"
+      fi
+    fi
     echo "</pluggedin-memory-session>"
   fi
 else

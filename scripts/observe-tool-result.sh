@@ -47,6 +47,15 @@ curl -s -X POST "${BASE_URL}/api/memory/sessions/${SESSION_UUID}/observations" \
   -d "{\"observationType\": \"${OBSERVATION_TYPE}\", \"content\": ${CONTENT_ESCAPED}}" \
   2>/dev/null > /dev/null || true
 
+# Record temporal event for synchronicity detection
+if [[ -n "$TOOL_NAME" ]]; then
+  curl -s -X POST "${BASE_URL}/api/memory/temporal-events" \
+    -H "Authorization: Bearer ${API_KEY}" \
+    -H "Content-Type: application/json" \
+    -d "{\"events\":[{\"tool_name\":\"${TOOL_NAME}\",\"event_type\":\"tool_result\",\"outcome\":\"${OUTCOME:-neutral}\"}]}" \
+    --max-time 3 2>/dev/null &
+fi
+
 # If error detected, query CBP for collective knowledge about this error
 if [ "$OBSERVATION_TYPE" = "error_pattern" ]; then
   ERROR_QUERY=$(echo "$CONTENT" | head -c 300)
