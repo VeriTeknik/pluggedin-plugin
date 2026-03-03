@@ -88,7 +88,7 @@ Tell the user:
 
 > Setup complete! Your API key has been saved to `.claude/settings.local.json`.
 >
-> **Please restart Claude Code** for the changes to take effect, then run `/pluggedin:status` to verify.
+> The MCP proxy will detect the new key within a few seconds. Run `/pluggedin:status` to verify.
 
 ## Manual Setup (Fallback)
 
@@ -107,4 +107,4 @@ If the device authorization flow fails, provide these manual instructions:
    }
    ```
 
-3. **Restart Claude Code** and run `/pluggedin:status`
+3. Run `/pluggedin:status` to verify (the MCP proxy picks up the key automatically)
