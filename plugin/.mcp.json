@@ -2,7 +2,7 @@
   "mcpServers": {
     "pluggedin": {
       "command": "npx",
-      "args": ["-y", "@anthropic-ai/mcp-proxy", "--endpoint", "https://plugged.in"],
+      "args": ["-y", "@pluggedin/pluggedin-mcp-proxy@latest"],
       "env": {
         "PLUGGEDIN_API_KEY": "${PLUGGEDIN_API_KEY}"
       }
