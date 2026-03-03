@@ -49,9 +49,22 @@ The plugin uses the Anthropic MCP proxy to connect to the Plugged.in MCP endpoin
 
 ### Setup
 
-After installing, run the `/pluggedin:setup` skill to configure your connection:
+After installing, run `/pluggedin:setup` in Claude Code. The plugin uses a browser-based device authorization flow (similar to `gh auth login`):
 
-1. Get your API key from https://plugged.in/settings (API Keys section) -- it starts with `pg_in_`
+1. Claude calls the Plugged.in API to initiate authorization
+2. Your browser opens to a verification page
+3. Verify the code shown in your terminal matches the one in the browser
+4. Select a Hub and click **Authorize**
+5. The API key is automatically saved to `.claude/settings.local.json`
+6. Restart Claude Code, then run `/pluggedin:status` to verify
+
+No manual key copying needed -- the entire flow is automatic.
+
+#### Manual Setup (Fallback)
+
+If the device authorization flow fails (e.g., network issues), you can configure manually:
+
+1. Get your API key from [plugged.in/settings](https://plugged.in/settings) (API Keys section) -- it starts with `pg_in_`
 2. Add it to your project's `.claude/settings.local.json` (gitignored):
 
 ```json
@@ -62,13 +75,7 @@ After installing, run the `/pluggedin:setup` skill to configure your connection:
 }
 ```
 
-Or export it as an environment variable:
-
-```bash
-export PLUGGEDIN_API_KEY="pg_in_your_key_here"
-```
-
-3. Verify the connection with `/pluggedin:status`
+3. Restart Claude Code and verify with `/pluggedin:status`
 
 ## Features
 
@@ -132,7 +139,7 @@ export PLUGGEDIN_API_KEY="pg_in_your_key_here"
 
 | Skill | Command | Description |
 |-------|---------|-------------|
-| **Setup** | `/pluggedin:setup` | Configure your API key and MCP connection |
+| **Setup** | `/pluggedin:setup` | Browser-based device authorization flow (auto-configures API key) |
 | **Status** | `/pluggedin:status` | Check connection status, active session, and memory statistics |
 | **Memory Workflow** | `/pluggedin:memory-workflow` | Manage the full memory session lifecycle (start, observe, end) |
 | **Memory Search** | `/pluggedin:memory-search` | Semantic search across past memories with progressive disclosure |
