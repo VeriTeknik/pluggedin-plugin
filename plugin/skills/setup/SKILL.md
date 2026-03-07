@@ -34,16 +34,18 @@ If the request fails, fall back to the manual setup instructions at the bottom o
 
 ### Step 4: Open the browser
 
-Open the `verification_url` in the user's browser:
+Try to open the `verification_url` in the user's browser. Use platform detection:
 
 ```bash
-open "$VERIFICATION_URL"       # macOS
-# xdg-open "$VERIFICATION_URL" # Linux
+# Try each opener, suppress errors
+open "$VERIFICATION_URL" 2>/dev/null || xdg-open "$VERIFICATION_URL" 2>/dev/null || true
 ```
+
+**If the command fails or exits non-zero** (e.g., remote/headless server without a display), do NOT treat this as an error. Simply show the URL to the user so they can open it manually.
 
 ### Step 5: Display the verification code
 
-Tell the user:
+If the browser opened successfully, tell the user:
 
 > Your browser has been opened. Please verify the code shown matches:
 >
@@ -51,7 +53,17 @@ Tell the user:
 >
 > Then click "Authorize" in the browser. Waiting for approval...
 
-Replace `USER_CODE` with the actual `user_code` from step 3.
+If the browser could NOT be opened (remote server, headless, xdg-open not found), tell the user:
+
+> Your browser couldn't be opened automatically. Please open this URL manually:
+>
+> **`VERIFICATION_URL`**
+>
+> Verify the code matches: **`USER_CODE`**
+>
+> Then click "Authorize" in the browser. Waiting for approval...
+
+Replace `USER_CODE` and `VERIFICATION_URL` with the actual values from step 3.
 
 ### Step 6: Poll for approval
 
