@@ -19,7 +19,7 @@ RESPONSE=$(curl -s -w "\n%{http_code}" \
   -X POST "${BASE_URL}/api/memory/sessions" \
   -H "Authorization: Bearer ${API_KEY}" \
   -H "Content-Type: application/json" \
-  -d "{\"contentSessionId\": \"claude-code-${CLAUDE_SESSION_ID:-unknown}\"}" \
+  -d "{\"content_session_id\": \"claude-code-${CLAUDE_SESSION_ID:-unknown}\"}" \
   2>/dev/null || echo -e "\n000")
 
 HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
