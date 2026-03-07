@@ -1,7 +1,7 @@
 ---
 name: rag-context
 description: "Search the user's knowledge base for relevant documentation, guides, and reference material. Use when you need information that might be in uploaded documents."
-user-invocable: true
+user-invokable: true
 argument-hint: "<search query>"
 ---
 

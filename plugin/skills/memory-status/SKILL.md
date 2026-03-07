@@ -1,7 +1,7 @@
 ---
 name: memory-status
 description: "Show memory system status including active session, ring counts, and recent observations"
-user-invocable: true
+user-invokable: true
 ---
 
 # Memory Status

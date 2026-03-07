@@ -1,7 +1,7 @@
 ---
 name: memory-extraction
 description: "Smart observation capture - automatically identify and record important patterns, decisions, and insights during work. Use proactively during development sessions."
-user-invocable: false
+user-invokable: false
 ---
 
 # Memory Extraction

@@ -1,7 +1,7 @@
 ---
 name: memory-workflow
 description: "Guide the memory session lifecycle - start sessions, record observations, search memories, and end sessions with Z-reports. Use when working with Plugged.in memory system."
-user-invocable: true
+user-invokable: true
 argument-hint: "[start|end|status]"
 ---
 

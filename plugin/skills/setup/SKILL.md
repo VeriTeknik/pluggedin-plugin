@@ -1,7 +1,7 @@
 ---
 name: setup
 description: "Configure your Plugged.in API key and MCP connection for Claude Code integration via browser-based device authorization"
-user-invocable: true
+user-invokable: true
 ---
 
 # Plugged.in Setup
@@ -55,7 +55,11 @@ Replace `USER_CODE` with the actual `user_code` from step 3.
 
 ### Step 6: Poll for approval
 
-Poll the device code endpoint every `interval` seconds (default 5), up to `expires_in / interval` times:
+**IMPORTANT**: Before running the poll command, tell the user:
+
+> Waiting for browser authorization... (this polls every 5 seconds until you approve)
+
+Then poll the device code endpoint every `interval` seconds (default 5), up to `expires_in / interval` times:
 
 ```bash
 curl -s "$BASE_URL/api/cli/auth/poll?device_code=$DEVICE_CODE"
@@ -69,9 +73,12 @@ Check the `status` field in the response:
 
 ### Step 7: Save the API key
 
-Read the existing `.claude/settings.local.json` file (create if it does not exist). Merge the `PLUGGEDIN_API_KEY` into the `env` object, preserving any existing keys. Write the file back.
+Save the API key to **both** locations so both Claude Code and the MCP proxy can find it:
 
-The resulting file should look like:
+1. **Project-level**: Read `.claude/settings.local.json` (create if missing), merge `PLUGGEDIN_API_KEY` into the `env` object, write back.
+2. **User-level**: Do the same for `~/.claude/settings.local.json` (the MCP proxy needs this because its working directory is not the project root).
+
+The resulting files should look like:
 ```json
 {
   "env": {
@@ -80,13 +87,13 @@ The resulting file should look like:
 }
 ```
 
-If `PLUGGEDIN_API_BASE_URL` or `PLUGGEDIN_MCP_ENDPOINT` are set in the environment, include them in the file as well.
+If `PLUGGEDIN_API_BASE_URL` or `PLUGGEDIN_MCP_ENDPOINT` are set in the environment, include them in both files as well.
 
 ### Step 8: Done
 
 Tell the user:
 
-> Setup complete! Your API key has been saved to `.claude/settings.local.json`.
+> Setup complete! Your API key has been saved to both `.claude/settings.local.json` and `~/.claude/settings.local.json`.
 >
 > The MCP proxy will detect the new key within a few seconds. Run `/pluggedin:status` to verify.
 
@@ -98,7 +105,7 @@ If the device authorization flow fails, provide these manual instructions:
    - Click "Generate API Key"
    - Copy the key (starts with `pg_in_`)
 
-2. **Configure the API key** in `.claude/settings.local.json`:
+2. **Configure the API key** in both `.claude/settings.local.json` (project) and `~/.claude/settings.local.json` (user):
    ```json
    {
      "env": {

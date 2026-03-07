@@ -1,7 +1,7 @@
 ---
 name: status
 description: "Check Plugged.in connection status, active session, and memory statistics"
-user-invocable: true
+user-invokable: true
 ---
 
 # Plugged.in Status
