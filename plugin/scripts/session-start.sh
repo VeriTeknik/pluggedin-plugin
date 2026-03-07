@@ -6,6 +6,11 @@
 
 set -euo pipefail
 
+# Read hook input JSON from stdin (Claude Code passes context this way)
+HOOK_INPUT=$(cat)
+CLAUDE_SESSION_ID=$(echo "$HOOK_INPUT" | grep -o '"session_id":"[^"]*"' | head -1 | cut -d'"' -f4)
+: "${CLAUDE_SESSION_ID:=unknown}"
+
 API_KEY="${PLUGGEDIN_API_KEY:-}"
 BASE_URL="${PLUGGEDIN_API_BASE_URL:-https://plugged.in}"
 
@@ -19,7 +24,7 @@ RESPONSE=$(curl -s -w "\n%{http_code}" \
   -X POST "${BASE_URL}/api/memory/sessions" \
   -H "Authorization: Bearer ${API_KEY}" \
   -H "Content-Type: application/json" \
-  -d "{\"content_session_id\": \"claude-code-${CLAUDE_SESSION_ID:-unknown}\"}" \
+  -d "{\"content_session_id\": \"claude-code-${CLAUDE_SESSION_ID}\"}" \
   2>/dev/null || echo -e "\n000")
 
 HTTP_CODE=$(echo "$RESPONSE" | tail -n1)

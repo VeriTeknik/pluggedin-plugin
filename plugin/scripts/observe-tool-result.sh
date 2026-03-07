@@ -9,6 +9,13 @@
 
 set -euo pipefail
 
+# Read hook input from stdin (Claude Code provides JSON with tool_name, tool_response, etc.)
+INPUT=$(cat 2>/dev/null || echo "")
+
+# Extract session_id from hook input for state directory lookup
+CLAUDE_SESSION_ID=$(echo "$INPUT" | grep -o '"session_id":"[^"]*"' | head -1 | cut -d'"' -f4)
+: "${CLAUDE_SESSION_ID:=$$}"
+
 API_KEY="${PLUGGEDIN_API_KEY:-}"
 BASE_URL="${PLUGGEDIN_API_BASE_URL:-https://plugged.in}"
 
@@ -16,16 +23,13 @@ if [ -z "$API_KEY" ]; then
   exit 0
 fi
 
-HOOK_STATE_DIR="${TMPDIR:-/tmp}/pluggedin-${CLAUDE_SESSION_ID:-$$}"
+HOOK_STATE_DIR="${TMPDIR:-/tmp}/pluggedin-${CLAUDE_SESSION_ID}"
 
 if [ ! -f "$HOOK_STATE_DIR/session_uuid" ]; then
   exit 0
 fi
 
 SESSION_UUID=$(cat "$HOOK_STATE_DIR/session_uuid")
-
-# Read hook input from stdin (Claude Code provides JSON with tool_name, tool_response, etc.)
-INPUT=$(cat 2>/dev/null || echo "")
 
 # Extract tool_name and tool_response from the hook input JSON
 PARSED=$(echo "$INPUT" | python3 -c "
