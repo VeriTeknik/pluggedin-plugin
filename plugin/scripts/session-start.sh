@@ -8,7 +8,7 @@ set -euo pipefail
 
 # Read hook input JSON from stdin (Claude Code passes context this way)
 HOOK_INPUT=$(cat)
-CLAUDE_SESSION_ID=$(echo "$HOOK_INPUT" | grep -o '"session_id":"[^"]*"' | head -1 | cut -d'"' -f4)
+CLAUDE_SESSION_ID=$(echo "$HOOK_INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('session_id',''))" 2>/dev/null)
 : "${CLAUDE_SESSION_ID:=unknown}"
 
 API_KEY="${PLUGGEDIN_API_KEY:-}"
@@ -31,8 +31,8 @@ HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
 BODY=$(echo "$RESPONSE" | sed '$d')
 
 if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ]; then
-  SESSION_UUID=$(echo "$BODY" | grep -o '"uuid":"[^"]*"' | head -1 | cut -d'"' -f4)
-  MEMORY_SESSION_ID=$(echo "$BODY" | grep -o '"memorySessionId":"[^"]*"' | head -1 | cut -d'"' -f4)
+  SESSION_UUID=$(echo "$BODY" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('data',{}).get('uuid',''))" 2>/dev/null)
+  MEMORY_SESSION_ID=$(echo "$BODY" | python3 -c "import sys,json; d=json.load(sys.stdin); print(d.get('data',{}).get('memorySessionId',''))" 2>/dev/null)
 
   if [ -n "$SESSION_UUID" ]; then
     # Store session info for other hooks to use

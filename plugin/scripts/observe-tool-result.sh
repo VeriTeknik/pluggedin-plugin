@@ -13,7 +13,7 @@ set -euo pipefail
 INPUT=$(cat 2>/dev/null || echo "")
 
 # Extract session_id from hook input for state directory lookup
-CLAUDE_SESSION_ID=$(echo "$INPUT" | grep -o '"session_id":"[^"]*"' | head -1 | cut -d'"' -f4)
+CLAUDE_SESSION_ID=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('session_id',''))" 2>/dev/null)
 : "${CLAUDE_SESSION_ID:=$$}"
 
 API_KEY="${PLUGGEDIN_API_KEY:-}"

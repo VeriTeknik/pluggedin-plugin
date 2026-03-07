@@ -8,7 +8,7 @@ set -euo pipefail
 
 # Read hook input JSON from stdin (Claude Code passes context this way)
 HOOK_INPUT=$(cat)
-CLAUDE_SESSION_ID=$(echo "$HOOK_INPUT" | grep -o '"session_id":"[^"]*"' | head -1 | cut -d'"' -f4)
+CLAUDE_SESSION_ID=$(echo "$HOOK_INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('session_id',''))" 2>/dev/null)
 : "${CLAUDE_SESSION_ID:=$$}"
 
 API_KEY="${PLUGGEDIN_API_KEY:-}"
