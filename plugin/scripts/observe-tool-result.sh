@@ -70,7 +70,7 @@ fi
 OBSERVATION_PAYLOAD=$(echo "$TOOL_RESULT" | head -c 2000 | python3 -c "
 import json, sys
 content = sys.stdin.read()
-print(json.dumps({'observationType': sys.argv[1], 'content': content}))
+print(json.dumps({'type': sys.argv[1], 'content': content}))
 " "$OBSERVATION_TYPE" 2>/dev/null || echo "")
 
 if [ -n "$OBSERVATION_PAYLOAD" ]; then
