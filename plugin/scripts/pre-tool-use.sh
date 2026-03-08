@@ -5,8 +5,8 @@
 #   tool_name, tool_input, tool_use_id, session_id, cwd, etc.
 set -euo pipefail
 
-API_KEY="${PLUGGEDIN_API_KEY:-}"
-BASE_URL="${PLUGGEDIN_API_BASE_URL:-https://plugged.in}"
+# Load credentials (env var → ~/.config/pluggedin/credentials.json)
+source "$(dirname "$0")/load-credentials.sh"
 
 if [[ -z "$API_KEY" ]]; then exit 0; fi
 

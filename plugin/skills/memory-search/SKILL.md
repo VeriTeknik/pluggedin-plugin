@@ -1,7 +1,7 @@
 ---
 name: memory-search
 description: "Search past memories semantically. Returns summaries first, use memory-details for full content."
-user-invokable: true
+user-invocable: true
 argument-hint: "<search query>"
 ---
 

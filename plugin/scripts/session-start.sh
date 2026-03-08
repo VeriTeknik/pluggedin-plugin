@@ -11,8 +11,8 @@ HOOK_INPUT=$(cat)
 CLAUDE_SESSION_ID=$(echo "$HOOK_INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('session_id',''))" 2>/dev/null)
 : "${CLAUDE_SESSION_ID:=unknown}"
 
-API_KEY="${PLUGGEDIN_API_KEY:-}"
-BASE_URL="${PLUGGEDIN_API_BASE_URL:-https://plugged.in}"
+# Load credentials (env var → ~/.config/pluggedin/credentials.json)
+source "$(dirname "$0")/load-credentials.sh"
 
 if [ -z "$API_KEY" ]; then
   echo "Plugged.in memory: No API key configured. Run /pluggedin:setup to configure."

@@ -1,7 +1,7 @@
 ---
 name: setup
 description: "Configure your Plugged.in API key and MCP connection for Claude Code integration via browser-based device authorization"
-user-invokable: true
+user-invocable: true
 ---
 
 # Plugged.in Setup
@@ -85,27 +85,42 @@ Check the `status` field in the response:
 
 ### Step 7: Save the API key
 
-Save the API key to **both** locations so both Claude Code and the MCP proxy can find it:
+Save the API key to `~/.config/pluggedin/credentials.json` (XDG-compliant, outside any git repo):
 
-1. **Project-level**: Read `.claude/settings.local.json` (create if missing), merge `PLUGGEDIN_API_KEY` into the `env` object, write back.
-2. **User-level**: Do the same for `~/.claude/settings.local.json` (the MCP proxy needs this because its working directory is not the project root).
+```bash
+mkdir -p ~/.config/pluggedin
+```
 
-The resulting files should look like:
+Write the credentials file:
+```json
+{
+  "api_key": "pg_in_...",
+  "base_url": "https://plugged.in"
+}
+```
+
+If `PLUGGEDIN_API_BASE_URL` is set in the environment, use that value for `base_url`. If `PLUGGEDIN_MCP_ENDPOINT` is set, include it as `mcp_endpoint`.
+
+**Also** save to `.claude/settings.local.json` (both project-level and user-level) so that hook scripts receive the API key as an environment variable:
+
 ```json
 {
   "env": {
-    "PLUGGEDIN_API_KEY": "pg_in_..."
+    "PLUGGEDIN_API_KEY": "pg_in_...",
+    "PLUGGEDIN_API_BASE_URL": "https://plugged.in"
   }
 }
 ```
 
-If `PLUGGEDIN_API_BASE_URL` or `PLUGGEDIN_MCP_ENDPOINT` are set in the environment, include them in both files as well.
+Read any existing `.claude/settings.local.json` first and merge — don't overwrite other settings.
 
 ### Step 8: Done
 
 Tell the user:
 
-> Setup complete! Your API key has been saved to both `.claude/settings.local.json` and `~/.claude/settings.local.json`.
+> Setup complete! Your API key has been saved to:
+> - `~/.config/pluggedin/credentials.json` (primary — used by MCP proxy)
+> - `.claude/settings.local.json` (for hook scripts environment)
 >
 > The MCP proxy will detect the new key within a few seconds. Run `/pluggedin:status` to verify.
 
@@ -117,7 +132,18 @@ If the device authorization flow fails, provide these manual instructions:
    - Click "Generate API Key"
    - Copy the key (starts with `pg_in_`)
 
-2. **Configure the API key** in both `.claude/settings.local.json` (project) and `~/.claude/settings.local.json` (user):
+2. **Save the credentials**:
+   ```bash
+   mkdir -p ~/.config/pluggedin
+   cat > ~/.config/pluggedin/credentials.json << 'EOF'
+   {
+     "api_key": "pg_in_your_key_here"
+   }
+   EOF
+   ```
+
+3. **Also add to Claude settings** so hook scripts can access it:
+   Create/edit both `.claude/settings.local.json` (project) and `~/.claude/settings.local.json` (user):
    ```json
    {
      "env": {
@@ -126,4 +152,4 @@ If the device authorization flow fails, provide these manual instructions:
    }
    ```
 
-3. Run `/pluggedin:status` to verify (the MCP proxy picks up the key automatically)
+4. Run `/pluggedin:status` to verify (the MCP proxy picks up the key automatically)

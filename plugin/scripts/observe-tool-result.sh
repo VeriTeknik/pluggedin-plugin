@@ -16,8 +16,8 @@ INPUT=$(cat 2>/dev/null || echo "")
 CLAUDE_SESSION_ID=$(echo "$INPUT" | python3 -c "import sys,json; print(json.load(sys.stdin).get('session_id',''))" 2>/dev/null)
 : "${CLAUDE_SESSION_ID:=$$}"
 
-API_KEY="${PLUGGEDIN_API_KEY:-}"
-BASE_URL="${PLUGGEDIN_API_BASE_URL:-https://plugged.in}"
+# Load credentials (env var → ~/.config/pluggedin/credentials.json)
+source "$(dirname "$0")/load-credentials.sh"
 
 if [ -z "$API_KEY" ]; then
   exit 0
