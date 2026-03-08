@@ -88,10 +88,10 @@ Check the `status` field in the response:
 Save the API key to `~/.config/pluggedin/credentials.json` (XDG-compliant, outside any git repo):
 
 ```bash
-mkdir -p ~/.config/pluggedin
+mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/pluggedin"
 ```
 
-Write the credentials file:
+Write the credentials file to `${XDG_CONFIG_HOME:-$HOME/.config}/pluggedin/credentials.json`:
 ```json
 {
   "api_key": "pg_in_...",
@@ -120,7 +120,7 @@ Tell the user:
 
 > Setup complete! Your API key has been saved to:
 > - `~/.config/pluggedin/credentials.json` (primary — used by MCP proxy)
-> - `.claude/settings.local.json` (for hook scripts environment)
+> - `.claude/settings.local.json` (for the hook scripts environment)
 >
 > The MCP proxy will detect the new key within a few seconds. Run `/pluggedin:status` to verify.
 
@@ -134,8 +134,8 @@ If the device authorization flow fails, provide these manual instructions:
 
 2. **Save the credentials**:
    ```bash
-   mkdir -p ~/.config/pluggedin
-   cat > ~/.config/pluggedin/credentials.json << 'EOF'
+   mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/pluggedin"
+   cat > "${XDG_CONFIG_HOME:-$HOME/.config}/pluggedin/credentials.json" << 'EOF'
    {
      "api_key": "pg_in_your_key_here"
    }

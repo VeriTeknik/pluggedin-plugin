@@ -3,7 +3,7 @@
 #
 # Sources API_KEY and BASE_URL from (in priority order):
 # 1. Environment variables (PLUGGEDIN_API_KEY, PLUGGEDIN_API_BASE_URL)
-# 2. ~/.config/pluggedin/credentials.json (XDG-compliant)
+# 2. $XDG_CONFIG_HOME/pluggedin/credentials.json (default: ~/.config)
 #
 # Usage: source this file from any hook script
 #   source "$(dirname "$0")/load-credentials.sh"
@@ -13,7 +13,7 @@ BASE_URL="${PLUGGEDIN_API_BASE_URL:-}"
 
 # If env var is missing, try XDG credentials file
 if [ -z "$API_KEY" ]; then
-  CRED_FILE="${HOME}/.config/pluggedin/credentials.json"
+  CRED_FILE="${XDG_CONFIG_HOME:-$HOME/.config}/pluggedin/credentials.json"
   if [ -f "$CRED_FILE" ]; then
     _CRED=$(python3 -c "
 import json, sys
