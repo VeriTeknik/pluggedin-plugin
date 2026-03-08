@@ -1,7 +1,7 @@
 ---
 name: memory-forget
 description: "Delete specific memories or clear memory categories. Use with caution - forgotten memories cannot be recovered."
-user-invokable: true
+user-invocable: true
 argument-hint: "<memory-uuid or 'search query'>"
 ---
 

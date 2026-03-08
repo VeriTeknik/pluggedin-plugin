@@ -1,7 +1,7 @@
 ---
 name: platform-tools
 description: "Complete reference for all Plugged.in MCP tools - memory, knowledge base, clipboard, documents, and notifications. Use when you need to know what tools are available."
-user-invokable: true
+user-invocable: true
 argument-hint: "[category]"
 ---
 
