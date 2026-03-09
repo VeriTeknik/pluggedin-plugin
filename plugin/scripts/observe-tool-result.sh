@@ -53,32 +53,50 @@ except Exception:
 
 IFS=$'\t' read -r TOOL_NAME TOOL_RESULT <<< "$PARSED"
 
-# Only observe if there's meaningful content (errors, etc.)
+# Only record errors — raw tool_results add noise without value
 if [ ${#TOOL_RESULT} -lt 10 ]; then
   exit 0
 fi
 
-# Check if this looks like an error
-OBSERVATION_TYPE="tool_result"
+# ── Privacy gate 1: user-tagged content ────────────────────────────────────
+# If the tool result contains <private>...</private>, skip storage entirely.
+# Users can wrap sensitive output blocks with this tag to opt out of memory.
+# Pattern is bounded (no unbounded backtracking) — safe against ReDoS.
+if echo "$TOOL_RESULT" | grep -q '<private>'; then
+  exit 0
+fi
+
+# ── Privacy gate 2: recursion prevention ───────────────────────────────────
+# Plugged.in memory injection outputs are tagged with known system tags.
+# Do NOT re-store injected memory context as new observations (infinite loop).
+if echo "$TOOL_RESULT" | grep -qE '<(pluggedin-memory-session|collective-intelligence|pluggedin-cbp-suggestion|memory-context)>'; then
+  exit 0
+fi
+
+# Classify: only proceed if this looks like an error
 OUTCOME="neutral"
-if echo "$TOOL_RESULT" | grep -qiE '(error|fail|exception|panic|ENOENT|EACCES|denied|refused)'; then
+OBSERVATION_TYPE=""
+if echo "$TOOL_RESULT" | grep -qiE '(error|fail|exception|panic|ENOENT|EACCES|denied|refused|traceback|fatal|abort|killed|segfault|oom)'; then
   OBSERVATION_TYPE="error_pattern"
   OUTCOME="failure"
 fi
 
-# Truncate to reasonable size and build JSON payload safely
-OBSERVATION_PAYLOAD=$(echo "$TOOL_RESULT" | head -c 2000 | python3 -c "
+# Store error observations only (not raw tool_results)
+if [ -n "$OBSERVATION_TYPE" ]; then
+  SCRUBBER="$(dirname "$0")/pci-scrub.py"
+  OBSERVATION_PAYLOAD=$(echo "$TOOL_RESULT" | head -c 2000 | python3 "$SCRUBBER" 2>/dev/null | python3 -c "
 import json, sys
 content = sys.stdin.read()
 print(json.dumps({'type': sys.argv[1], 'content': content}))
 " "$OBSERVATION_TYPE" 2>/dev/null || echo "")
 
-if [ -n "$OBSERVATION_PAYLOAD" ]; then
-  curl -s -X POST "${BASE_URL}/api/memory/sessions/${SESSION_UUID}/observations" \
-    -H "Authorization: Bearer ${API_KEY}" \
-    -H "Content-Type: application/json" \
-    -d "$OBSERVATION_PAYLOAD" \
-    2>/dev/null > /dev/null || true
+  if [ -n "$OBSERVATION_PAYLOAD" ]; then
+    curl -s -X POST "${BASE_URL}/api/memory/sessions/${SESSION_UUID}/observations" \
+      -H "Authorization: Bearer ${API_KEY}" \
+      -H "Content-Type: application/json" \
+      -d "$OBSERVATION_PAYLOAD" \
+      2>/dev/null > /dev/null || true
+  fi
 fi
 
 # Record temporal event for synchronicity detection

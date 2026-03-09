@@ -87,6 +87,44 @@ print(f'{total}\t{level}\t{tip}')
       fi
     fi
     echo "</pluggedin-memory-session>"
+
+    # ── Proactive context brief injection ──────────────────────────────────
+    # Fetch relevant procedures, longterm insights, and shocks from memory ring.
+    # Uses the working directory name as the query hint for relevance scoring.
+    QUERY_HINT=$(basename "${PWD:-workspace}" 2>/dev/null || echo "workspace")
+    FULL_QUERY="${QUERY_HINT} plan step procedure workflow"
+    ENCODED_QUERY=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$FULL_QUERY" 2>/dev/null || true)
+    RESUME_RESPONSE=$(curl -s \
+      "${BASE_URL}/api/memory/resume?query=${ENCODED_QUERY}" \
+      -H "Authorization: Bearer ${API_KEY}" \
+      --max-time 5 2>/dev/null || true)
+
+    CONTEXT_BRIEF=$(echo "$RESUME_RESPONSE" | python3 -c "
+import sys, json
+try:
+    d = json.load(sys.stdin)
+    data = d.get('data', {})
+    brief = data.get('brief', '')
+    # Check actual result arrays rather than the brief string to avoid brittle message matching
+    has_content = bool(data.get('procedures') or data.get('longterm') or data.get('shocks'))
+    if brief and has_content:
+        # Sanitize: strip angle brackets that could break pluggedin tags (except the memory-context tags themselves)
+        lines = brief.split('\n')
+        safe_lines = []
+        for line in lines:
+            if line.strip() in ('<memory-context>', '</memory-context>'):
+                safe_lines.append(line)
+            else:
+                safe_lines.append(line.replace('<', '[').replace('>', ']'))
+        print('\n'.join(safe_lines))
+except Exception:
+    pass
+" 2>/dev/null || true)
+
+    if [ -n "$CONTEXT_BRIEF" ]; then
+      echo ""
+      echo "$CONTEXT_BRIEF"
+    fi
   fi
 else
   echo "Plugged.in memory: Could not start session (HTTP ${HTTP_CODE}). Memory features will be unavailable."
