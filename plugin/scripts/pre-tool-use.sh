@@ -61,10 +61,13 @@ try:
     lines = []
     for p in procs:
         content = str(p.get('content', ''))[:200].replace('\n', ' ')
+        # Sanitize: strip angle brackets to prevent tag injection
+        content = content.replace('<', '[').replace('>', ']')
         if content:
             lines.append(f'[Procedure] {content}')
     for s in shocks:
         content = str(s.get('content', ''))[:200].replace('\n', ' ')
+        content = content.replace('<', '[').replace('>', ']')
         if content:
             lines.append(f'WARNING [Shock] {content}')
     if lines:

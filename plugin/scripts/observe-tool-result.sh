@@ -74,11 +74,11 @@ if echo "$TOOL_RESULT" | grep -qE '<(pluggedin-memory-session|collective-intelli
 fi
 
 # Classify: only proceed if this looks like an error
-OBSERVATION_TYPE="error_pattern"
-OUTCOME="failure"
-if ! echo "$TOOL_RESULT" | grep -qiE '(error|fail|exception|panic|ENOENT|EACCES|denied|refused|traceback|fatal|abort|killed|segfault|oom)'; then
-  # Not an error — skip memory storage, continue to temporal event + CBP
-  OBSERVATION_TYPE=""
+OUTCOME="neutral"
+OBSERVATION_TYPE=""
+if echo "$TOOL_RESULT" | grep -qiE '(error|fail|exception|panic|ENOENT|EACCES|denied|refused|traceback|fatal|abort|killed|segfault|oom)'; then
+  OBSERVATION_TYPE="error_pattern"
+  OUTCOME="failure"
 fi
 
 # Store error observations only (not raw tool_results)

@@ -103,9 +103,11 @@ print(f'{total}\t{level}\t{tip}')
 import sys, json
 try:
     d = json.load(sys.stdin)
-    brief = d.get('data', {}).get('brief', '')
-    # Only output if there is actual memory content (not just the empty template)
-    if brief and 'No relevant memories found' not in brief:
+    data = d.get('data', {})
+    brief = data.get('brief', '')
+    # Check actual result arrays rather than the brief string to avoid brittle message matching
+    has_content = bool(data.get('procedures') or data.get('longterm') or data.get('shocks'))
+    if brief and has_content:
         # Sanitize: strip angle brackets that could break pluggedin tags (except the memory-context tags themselves)
         lines = brief.split('\n')
         safe_lines = []
