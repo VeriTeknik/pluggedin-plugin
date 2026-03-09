@@ -92,8 +92,10 @@ print(f'{total}\t{level}\t{tip}')
     # Fetch relevant procedures, longterm insights, and shocks from memory ring.
     # Uses the working directory name as the query hint for relevance scoring.
     QUERY_HINT=$(basename "${PWD:-workspace}" 2>/dev/null || echo "workspace")
+    FULL_QUERY="${QUERY_HINT} plan step procedure workflow"
+    ENCODED_QUERY=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$FULL_QUERY" 2>/dev/null || true)
     RESUME_RESPONSE=$(curl -s \
-      "${BASE_URL}/api/memory/resume?query=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "${QUERY_HINT} plan step procedure workflow")" \
+      "${BASE_URL}/api/memory/resume?query=${ENCODED_QUERY}" \
       -H "Authorization: Bearer ${API_KEY}" \
       --max-time 5 2>/dev/null || true)
 

@@ -97,8 +97,10 @@ _RULES = [
         r'|\b[A-Z]{2}[\s]?\d{2}[\s]?\d{2}[\s]?\d{2}[\s]?[A-Z]\b'  # UK NI
         r'|\b[A-Z]{5}\d{4}[A-Z]\b'                  # Indian PAN
         r'|\b\d{4}[\s]\d{4}[\s]\d{4}\b'             # Indian Aadhaar
-        r'|(?<!\d)\d{9,12}(?!\d)'                   # Generic 9-12 digit ID (TR, DE, FR…)
         r')'
+        # Note: generic 9-12 digit patterns (TR TC, DE Steuer-ID, FR INSEE) are
+        # omitted intentionally — too many false positives (ports, timestamps,
+        # order/version numbers). Rely on Layer 2 (LLM semantic check) for those.
     ), '[NATIONAL_ID]'),
 
     # ── Home / user directory paths ────────────────────────────────────────
