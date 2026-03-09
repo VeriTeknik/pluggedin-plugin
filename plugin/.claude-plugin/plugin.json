@@ -1,6 +1,6 @@
 {
   "name": "pluggedin",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "description": "Plugged.in AI Infrastructure Platform integration - memory system, knowledge base, clipboard, and tool management for Claude Code",
   "author": {
     "name": "Cem Karaca",
